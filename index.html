@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Deploy with Docker + Jenkins</title>
+</head>
+<body>
+  <h2>Deploy Application</h2>
+  <form action="http://JENKINS_URL/job/JOB_NAME/buildWithParameters" method="GET">
+    <label>Git Repository URL:</label>
+    <input type="text" name="GIT_REPO" required><br><br>
+
+    <label>Docker Image Name:</label>
+    <input type="text" name="IMAGE_NAME" required><br><br>
+
+    <label>Docker Image Tag:</label>
+    <input type="text" name="IMAGE_TAG" value="latest" required><br><br>
+
+    <label>Container Name:</label>
+    <input type="text" name="CONTAINER_NAME" required><br><br>
+
+    <input type="submit" value="Build & Deploy">
+  </form>
+</body>
+</html>
