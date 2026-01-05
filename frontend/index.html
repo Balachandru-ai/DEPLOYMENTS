@@ -1,8 +1,7 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Deploy with Docker + Jenkins</title>
 
   <style>
@@ -18,7 +17,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #333;
     }
 
     .container {
@@ -29,10 +27,10 @@
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
     }
 
-    h2,h3 {
+    h2, h3 {
       text-align: center;
-      margin-bottom: 25px;
       color: #2c5364;
+      margin-bottom: 10px;
     }
 
     label {
@@ -49,13 +47,6 @@
       border: 1px solid #ccc;
       font-size: 14px;
       margin-bottom: 15px;
-      transition: 0.3s;
-    }
-
-    input[type="text"]:focus {
-      outline: none;
-      border-color: #2c5364;
-      box-shadow: 0 0 5px rgba(44, 83, 100, 0.5);
     }
 
     input[type="submit"] {
@@ -68,81 +59,95 @@
       font-size: 15px;
       font-weight: bold;
       cursor: pointer;
-      transition: 0.3s;
     }
 
     input[type="submit"]:hover {
       background: #203a43;
-      transform: translateY(-1px);
     }
 
-    .success {
-      margin-top: 18px;
+    .status {
+      margin-top: 15px;
       text-align: center;
       font-size: 14px;
-      color: #2e7d32;
       font-weight: 600;
+      display: none;
     }
+
+    .success { color: #2e7d32; }
+    .error { color: #c62828; }
   </style>
 </head>
 
 <body>
-
   <div class="container">
     <h2>Deploy Application</h2>
-    <h3>Database Entry application</h3>h3
+    <h3>Jenkins + Docker</h3>
+
     <form id="deployForm">
       <label>Git Repository URL</label>
-      <input type="text" name="GIT_REPO" placeholder="https://github.com/user/repo.git" required>
+      <input type="text" name="GIT_REPO"
+             value="https://github.com/Balachandru-ai/DEPLOYMENTS.git"
+             required />
 
       <label>Docker Image Name</label>
-      <input type="text" name="IMAGE_NAME" placeholder="myapp" required>
+      <input type="text" name="IMAGE_NAME" value="myapp" required />
 
       <label>Docker Image Tag</label>
-      <input type="text" name="IMAGE_TAG" value="latest" required>
+      <input type="text" name="IMAGE_TAG" value="latest" required />
 
       <label>Container Name</label>
-      <input type="text" name="CONTAINER_NAME" placeholder="myapp_container" required>
+      <input type="text" name="CONTAINER_NAME" value="my_app" required />
 
-      <input type="submit" value="Build & Deploy">
+      <input type="submit" value="Build & Deploy" />
     </form>
 
-    <p class="success">🚀 Deployment triggered via Jenkins</p>
+    <div id="status" class="status"></div>
   </div>
 
-<script>
-document.getElementById("deployForm").addEventListener("submit", function(e) {
-  e.preventDefault();
+  <script>
+    document.getElementById("deployForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
 
-  const data = {
-    GIT_REPO: document.querySelector('[name="GIT_REPO"]').value,
-    IMAGE_NAME: document.querySelector('[name="IMAGE_NAME"]').value,
-    IMAGE_TAG: document.querySelector('[name="IMAGE_TAG"]').value,
-    CONTAINER_NAME: document.querySelector('[name="CONTAINER_NAME"]').value
-  };
+      const status = document.getElementById("status");
+      status.style.display = "none";
 
-  // Save deployment info to backend
-  fetch("http://13.60.227.254:3000/api/deploy", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      git_repo: data.GIT_REPO,
-      image_name: data.IMAGE_NAME,
-      image_tag: data.IMAGE_TAG,
-      container_name: data.CONTAINER_NAME
-    })
-  })
-  .then(() => {
-    // Trigger Jenkins job
-    window.location.href =
-      "http://13.60.227.254:8080/job/my_deployments/buildWithParameters?" +
-      new URLSearchParams(data);
-  })
-  .catch(err => {
-    alert("❌ Backend not reachable: " + err);
-  });
-});
-</script>
+      const data = {
+        GIT_REPO: document.querySelector('[name="GIT_REPO"]').value,
+        IMAGE_NAME: document.querySelector('[name="IMAGE_NAME"]').value,
+        IMAGE_TAG: document.querySelector('[name="IMAGE_TAG"]').value,
+        CONTAINER_NAME: document.querySelector('[name="CONTAINER_NAME"]').value
+      };
 
+      try {
+        // 1️⃣ Save to backend (SQLite)
+        const res = await fetch("http://13.60.227.254:3000/api/deploy", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            git_repo: data.GIT_REPO,
+            image_name: data.IMAGE_NAME,
+            image_tag: data.IMAGE_TAG,
+            container_name: data.CONTAINER_NAME
+          })
+        });
+
+        if (!res.ok) throw new Error("Backend error");
+
+        // 2️⃣ Trigger Jenkins
+        window.location.href =
+          "http://13.60.227.254:8080/job/my_deployments/buildWithParameters?" +
+          new URLSearchParams(data);
+
+        status.textContent = "🚀 Deployment triggered successfully";
+        status.className = "status success";
+        status.style.display = "block";
+
+      } catch (err) {
+        status.textContent = "❌ Backend not reachable or Jenkins error";
+        status.className = "status error";
+        status.style.display = "block";
+      }
+    });
+  </script>
 </body>
 </html>
