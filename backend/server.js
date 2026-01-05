@@ -3,7 +3,7 @@ const db = require("./db");
 
 const app = express();
 
-/* ✅ REQUIRED middleware */
+/* ✅ middleware */
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -16,14 +16,15 @@ app.post("/api/deploy", (req, res) => {
   }
 
   const sql = `
-    INSERT INTO deployments (GIT_REPO, IMAGE_NAME, IMAGE_TAG, CONTAINER_NAME)
+    INSERT INTO deployments (git_repo, image_name, image_tag, container_name)
     VALUES (?, ?, ?, ?)
   `;
 
-  db.run(sql, [GIT_REPO, IMAGE_NAME, IMAGE_TAG, CONTAINER_NAME], function (err) {
+  db.run(sql, [git_repo, image_name, image_tag, container_name], function (err) {
     if (err) {
       return res.status(500).json({ error: err.message });
     }
+
     res.json({ status: "saved", id: this.lastID });
   });
 });
@@ -38,6 +39,7 @@ app.get("/api/deploy", (req, res) => {
   });
 });
 
-app.listen(3000, () => {
+/* ✅ VERY IMPORTANT */
+app.listen(3000, "0.0.0.0", () => {
   console.log("Backend running on port 3000");
 });
