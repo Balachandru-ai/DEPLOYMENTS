@@ -90,7 +90,8 @@
   <div class="container">
     <h2>Deploy Application Frontend</h2>
 
-    <form action="http://JENKINS_URL/job/JOB_NAME/buildWithParameters" method="GET">
+    <form action="http://13.60.227.254:8080/job/my_deployments/buildWithParameters
+" method="GET">
 
       <label>Git Repository URL</label>
       <input type="text" name="GIT_REPO" placeholder="https://github.com/user/repo.git" required>
@@ -127,7 +128,8 @@ document.querySelector("form").addEventListener("submit", function(e) {
     body: JSON.stringify(data)
   }).then(() => {
     window.location.href =
-      "http://JENKINS_URL/job/JOB_NAME/buildWithParameters?" +
+      "http://13.60.227.254:8080/job/my_deployments/buildWithParameters
+?" +
       new URLSearchParams(data);
   });
 });
