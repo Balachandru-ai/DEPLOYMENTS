@@ -88,11 +88,9 @@
 <body>
 
   <div class="container">
-    <h2>Deploy Application Frontend</h2>
+    <h2>Deploy Application</h2>
 
-    <form action="http://13.60.227.254:8080/job/my_deployments/buildWithParameters
-" method="GET">
-
+    <form id="deployForm">
       <label>Git Repository URL</label>
       <input type="text" name="GIT_REPO" placeholder="https://github.com/user/repo.git" required>
 
@@ -106,31 +104,41 @@
       <input type="text" name="CONTAINER_NAME" placeholder="myapp_container" required>
 
       <input type="submit" value="Build & Deploy">
-
     </form>
 
-    <p class="success">🚀 Frontend ready for deployment via Jenkins</p>
+    <p class="success">🚀 Deployment triggered via Jenkins</p>
   </div>
+
 <script>
-document.querySelector("form").addEventListener("submit", function(e) {
+document.getElementById("deployForm").addEventListener("submit", function(e) {
   e.preventDefault();
 
   const data = {
-    git_repo: document.querySelector('[name="GIT_REPO"]').value,
-    image_name: document.querySelector('[name="IMAGE_NAME"]').value,
-    image_tag: document.querySelector('[name="IMAGE_TAG"]').value,
-    container_name: document.querySelector('[name="CONTAINER_NAME"]').value
+    GIT_REPO: document.querySelector('[name="GIT_REPO"]').value,
+    IMAGE_NAME: document.querySelector('[name="IMAGE_NAME"]').value,
+    IMAGE_TAG: document.querySelector('[name="IMAGE_TAG"]').value,
+    CONTAINER_NAME: document.querySelector('[name="CONTAINER_NAME"]').value
   };
 
+  // Save deployment info to backend
   fetch("http://13.60.227.254:3000/api/deploy", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  }).then(() => {
+    body: JSON.stringify({
+      git_repo: data.GIT_REPO,
+      image_name: data.IMAGE_NAME,
+      image_tag: data.IMAGE_TAG,
+      container_name: data.CONTAINER_NAME
+    })
+  })
+  .then(() => {
+    // Trigger Jenkins job
     window.location.href =
-      "http://13.60.227.254:8080/job/my_deployments/buildWithParameters
-?" +
+      "http://13.60.227.254:8080/job/my_deployments/buildWithParameters?" +
       new URLSearchParams(data);
+  })
+  .catch(err => {
+    alert("❌ Backend not reachable: " + err);
   });
 });
 </script>
