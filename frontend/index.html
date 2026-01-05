@@ -121,7 +121,7 @@ document.querySelector("form").addEventListener("submit", function(e) {
     container_name: document.querySelector('[name="CONTAINER_NAME"]').value
   };
 
-  fetch("http://http://13.60.227.254:3000/api/deploy", {
+  fetch("http://13.60.227.254:3000/api/deploy", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data)
