@@ -7,10 +7,10 @@ const db = new sqlite3.Database('./database.db', () => {
 db.run(`
   CREATE TABLE IF NOT EXISTS deployments (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    git_repo TEXT,
-    image_name TEXT,
-    image_tag TEXT,
-    container_name TEXT,
+    GIT_REPO TEXT,
+    IMAGE_NAME TEXT,
+    IMAGE_TAG TEXT,
+    CONTAINER_NAME TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )
 `);
