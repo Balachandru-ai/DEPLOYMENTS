@@ -1,23 +1,43 @@
-const express = require('express');
-const db = require('./db');
+const express = require("express");
+const db = require("./db");
 
 const app = express();
-app.use(express.json());
 
-app.post('/api/deploy', (req, res) => {
+/* ✅ REQUIRED middleware */
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+/* ✅ POST: save deployment */
+app.post("/api/deploy", (req, res) => {
   const { git_repo, image_name, image_tag, container_name } = req.body;
 
-  db.run(
-    `INSERT INTO deployments VALUES (NULL, ?, ?, ?, ?, datetime('now'))`,
-    [git_repo, image_name, image_tag, container_name],
-    () => res.json({ status: "saved" })
-  );
+  if (!git_repo || !image_name || !image_tag || !container_name) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  const sql = `
+    INSERT INTO deployments (GIT_REPO, IMAGE_NAME, IMAGE_TAG, CONTAINER_NAME)
+    VALUES (?, ?, ?, ?)
+  `;
+
+  db.run(sql, [GIT_REPO, IMAGE_NAME, IMAGE_TAG, CONTAINER_NAME], function (err) {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    res.json({ status: "saved", id: this.lastID });
+  });
 });
 
-app.get('/api/deploy', (req, res) => {
+/* ✅ GET: list deployments */
+app.get("/api/deploy", (req, res) => {
   db.all(`SELECT * FROM deployments ORDER BY id DESC`, (err, rows) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
     res.json(rows);
   });
 });
 
-app.listen(3000, () => console.log("Backend running on port 3000"));
+app.listen(3000, () => {
+  console.log("Backend running on port 3000");
+});
