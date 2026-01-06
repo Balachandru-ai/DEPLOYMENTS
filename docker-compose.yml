@@ -1,0 +1,23 @@
+version: "3.8"
+
+services:
+  backend:
+    build: ./backend
+    container_name: deploy_backend
+    ports:
+      - "3000:3000"
+    volumes:
+      - backend_data:/app
+    restart: always
+
+  frontend:
+    build: ./frontend
+    container_name: deploy_frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: always
+
+volumes:
+  backend_data:
