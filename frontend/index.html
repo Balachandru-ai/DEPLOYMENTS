@@ -120,7 +120,7 @@
 
       try {
         // 1️⃣ Save to backend (SQLite)
-        const res = await fetch("http://13.60.227.254:3000/api/deploy", {
+        const res = await fetch("http://http://51.20.108.70:3000/api/deploy", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -135,7 +135,7 @@
 
         // 2️⃣ Trigger Jenkins
         window.location.href =
-          "http://13.60.227.254:8080/job/my_deployments/buildWithParameters?" +
+          "http://51.20.108.70/:8080/job/my_deployments/buildWithParameters?" +
           new URLSearchParams(data);
 
         status.textContent = "🚀 Deployment triggered successfully";
